@@ -1,7 +1,7 @@
-read_file <- function (judge){
-  file <- paste (getwd(), paste(judge, "txt", sep = "."), sep = "/")
-
-
+read_file <- function (justice){
+  justice <- "boyle"
+  justice <- tolower(justice)
+  file <- paste (getwd(), paste(justice, "txt", sep = "."), sep = "/")
   author <- scan(file = file, 
                       what = "character",
                       blank.lines.skip = T,
@@ -9,11 +9,10 @@ read_file <- function (judge){
                       skip = 20,
                       sep = "\n",
                       strip.white = T)
-print (file)
-print (head(author))
+
 }
 
-`judge_number_cases <- function(judge, number){
+justice_number_cases <- function(justice, number){
   a <- NULL
   cases <- NULL
   number <- number:1
@@ -23,19 +22,20 @@ print (head(author))
         a <- as.character(number[i])
       }  
     }
-    cases[i] <- paste(judge, a, sep = "_")
+    cases[i] <- paste(justice, a, sep = "_")
   }
   cases
 }
 
 divide_into_cases  <- function(){
-  begin <- grep("^\\(Cite as: (.*)\\)$", boyle, value = F)
-  end   <- (grep("^END OF DOCUMENT$", boyle, value = F))
+  begin <- grep("^\\(Cite as: (.*)\\)$", author, value = F)
+  end   <- (grep("^END OF DOCUMENT$", author, value = F))
   begin <- begin[1:length(end)]
-  file_name <- judge_number_cases("boyle", length(begin)) #function call
+  file_name <- justice_number_cases(justice, length(begin)) #function call
+  dir.create(justice)
     for(i in 1:length(file_name)) {
-      mycase <- paste (boyle[begin[i]: end[i]], collapse = " ")
-      file <- paste(getwd(), "test", file_name[i], sep = "/") #create "test" directory
+      mycase <- paste (author[begin[i]: end[i]], collapse = " ")
+      file <- paste(getwd(), justice, file_name[i], sep = "/") #create "test" directory
       write(mycase, file = file)
   }
 }
