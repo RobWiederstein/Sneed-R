@@ -1,0 +1,6 @@
+_Store
+.DS_Store
+.Rhistory
+.Rproj.user
+.RData
+*.html
