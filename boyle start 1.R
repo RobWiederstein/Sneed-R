@@ -1,8 +1,6 @@
-read_file <- function (justice){
-  justice <- "boyle"
-  justice <- tolower(justice)
-  file <- paste (getwd(), paste(justice, "txt", sep = "."), sep = "/")
-  author <- scan(file = file, 
+#read data in
+file <- paste (getwd(), paste("boyle", "txt", sep = "."), sep = "/")
+author <- scan(file = file, 
                       what = "character",
                       blank.lines.skip = T,
                       n = 100000,
@@ -10,39 +8,52 @@ read_file <- function (justice){
                       sep = "\n",
                       strip.white = T)
 
-}
 
-justice_number_cases <- function(justice, number){
-  a <- NULL
-  cases <- NULL
-  number <- number:1
-  for (i in seq_along(number)){
-    if (number[i] < 10){a <- paste("00", number[i], sep = "")}else{
-      if (number[i] < 100){a <- paste("0", number[i], sep = "")}else{
-        a <- as.character(number[i])
-      }  
+
+justice_number_cases <- function(justice = "boyle"){
+  # set up file names using WL numbers--get to author_"Westlaw number"
+  cite <- grep("^\\(Cite as: (.*)\\)$", author, value = T)
+  cite <- gsub("\\(Cite as: ", "", cite)
+  cite <- gsub("^[0-9L](.*)Ky\\.\\), ", "", cite)
+  cite <- gsub ("\\(Ky\\.\\)\\)", "", cite)
+  cite[609] <- "1809 WL 1416"
+  cite[251] <- "1816 WL 1613"
+  library (gdata)
+  cite <- trim (cite)
+  library (stringr)
+  cite <- str_split(cite, pattern = " ")
+  i <- NULL
+  for(i in 1:length(cite)) {
+    if(nchar(cite[[i]][3])==3){
+      cite[[i]][3] <- paste("0", cite[[i]][3], sep = "")
     }
-    cases[i] <- paste(justice, a, sep = "_")
   }
-  cases
+  i <- NULL
+  for(i in 1:length(cite)) {
+    cite[[i]] <- paste(cite[[i]][1], cite[[i]][2], cite[[i]][3], collapse = "")
+  }
+  cite <- unlist (cite)
+  cite <- gsub (" ", "", cite)
+  cite <- paste("boyle", cite, sep = "_")
 }
 
-divide_into_cases  <- function(){
+divide_into_cases  <- function(justice = "boyle"){
   begin <- grep("^\\(Cite as: (.*)\\)$", author, value = F)
   end   <- (grep("^END OF DOCUMENT$", author, value = F))
   begin <- begin[1:length(end)]
-  file_name <- justice_number_cases(justice, length(begin)) #function call
-  dir.create(justice)
+  file_name <- cite #function call
+  file_name <- file_name[1:length(end)]
+  dir.create("boyle")
     for(i in 1:length(file_name)) {
       mycase <- paste (author[begin[i]: end[i]], collapse = " ")
-      file <- paste(getwd(), justice, file_name[i], sep = "/") #create "test" directory
+      file <- paste(getwd(), "boyle", file_name[i], sep = "/") #create "test" directory
       write(mycase, file = file)
   }
 }
 
-strip_headnotes    <- function(){
-  path  <- paste(getwd(), "test", sep = "/")
-  files_in <- list.files(path = path)  #all files?? what if other files in directory?
+strip_headnotes    <- function(justice = "boyle"){
+  path  <- paste(getwd(), "boyle", sep = "/")
+  files_in <- list.files(path = path, pattern = "^boyle")  #all files?? what if other files in directory?
   files_out <- paste (files_in, "-out.txt", sep = "") 
   i     <- NULL
   for(i in seq(along = files_in)) { # start for loop with numeric or character vector;
@@ -50,14 +61,36 @@ strip_headnotes    <- function(){
     x <- scan(paste(path, files_in[i], sep = "/"), what = "character", sep = "\n")
     x <- gsub("\\(Cite as:(.*)BOYLE\\.", "", x) #lop off front end of case
     x <- gsub("Ky.App.(.*)END OF DOCUMENT", "", x) #lop off back end of case
-    file <- paste(getwd(), "corpus", files_out[i], sep = "/")
+    file <- paste(getwd(), "boyle", files_out[i], sep = "/")
     write (x, file = file)
   }
 }
 
-rm (file, boyle)
-divide_into_cases()
-strip_headnotes()
+check_dissent <- function(justice = "boyle"){
+  path  <- paste(getwd(), "boyle", sep = "/")
+  files_in <- list.files(path = path, pattern = ".txt$")  #all files?? what if other files in directory?
+  files_out <- paste (files_in, "-out1.txt", sep = "")
+  omit.case <- NULL
+  keep.case <- NULL
+  i     <- NULL
+  for(i in seq(along = files_in)) { # start for loop with numeric or character vector;
+    # numeric vector is often more flexible
+    x <- scan(paste(path, files_in[i], sep = "/"), what = "character", sep = "\n")
+    if(length (grep ("concur", x, ignore.case = T)) >= 1 |
+         length (grep ("dissent", x, ignore.case = T)) >= 1){
+      omit.case <- append(omit.case, files_in[i], after = length(omit.case))}else{
+      next (i)
+      }
+    omit.case <- paste(path, omit.case, sep = "/")
+    file.remove(omit.case)  
+  }
+}
+
+
+
+
+
+rm (file, author)
 #we have a corpus!! Is it any good?  Run it with Stylo.
 library (stylo)
 a <- stylo()
@@ -117,34 +150,4 @@ for(i in seq(along=files)) { # start for loop with numeric or character vector;
 }
 
 ls()
-
-##################################
-# set up file names using WL numbers--get to author_"Westlaw number"
-####################################
-cite <- grep("^\\(Cite as: (.*)\\)$", boyle, value = T)
-cite
-cite <- gsub("\\(Cite as: ", "", cite)
-cite
-cite <- gsub("^[0-9L](.*)Ky.\\), ", "", cite)
-cite
-cite <- gsub ("\\(Ky.\\)\\)", "", cite)
-cite
-cite[609] <- "1809 WL 1416"
-cite[251] <- "1816 WL 1613"
-cite
-
-library (gdata)
-cite <- trim (cite)
-cite 
-library(stringr)
-cite <- str_split(cite, pattern = " ")
-temp <- unlist(cite)
-temp <- temp[seq(3, length(temp), by = 3)]
-temp[nchar(temp)==3] <- paste("0", temp [nchar(temp)==3], sep = "")
-
-
-
-
-lapply()
-a <- paste("0", a[which(nchar(a)==1)], sep = "")
 
