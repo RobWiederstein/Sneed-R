@@ -16,19 +16,16 @@ load_cases <- function(justice){
     }
 }
 
+case_cite <- function(cases){
+  cite <- grep("^\\(Cite as: (.*)\\)$", cases, value = T)
+  pattern <- "18[0123][0-9].WL.(.*)\\(K"
+  x <- regexpr(pattern, cite)
+  cite <- substring(cite, x, x + attr(x, "match.length") - 1)
+  cite <- trim(gsub("\\(K", "", cite))
+  cite
+}
 
-
-
-# set up file names--Author_Westlaw Number
-justice_number_cases <- function(justice = "boyle"){
-  cite <- grep("^\\(Cite as: (.*)\\)$", author, value = T)
-  cite <- gsub("\\(Cite as: ", "", cite)
-  cite <- gsub("^[0-9L](.*)Ky\\.\\), ", "", cite)
-  cite <- gsub ("\\(Ky\\.\\)\\)", "", cite)
-  cite[609] <- "1809 WL 1416"
-  cite[251] <- "1816 WL 1613"
-  library (gdata)
-  cite <- trim (cite)
+same_cite_length <- function(cite){
   library (stringr)
   cite <- str_split(cite, pattern = " ")
   i <- NULL
@@ -43,7 +40,7 @@ justice_number_cases <- function(justice = "boyle"){
   }
   cite <- unlist (cite)
   cite <- gsub (" ", "", cite)
-  cite <- paste("boyle", cite, sep = "_")
+  print(cite)
 }
 
 #split download into cases and save
