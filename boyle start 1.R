@@ -1,5 +1,6 @@
 #read data in
-file <- paste (getwd(), paste("boyle", "txt", sep = "."), sep = "/")
+file <- paste (getwd(), paste("data/boyle", "txt", sep = "."), sep = "/")
+file
 author <- scan(file = file, 
                       what = "character",
                       blank.lines.skip = T,
