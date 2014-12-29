@@ -1,13 +1,22 @@
 #read data in
-file <- paste (getwd(), paste("data/boyle", "txt", sep = "."), sep = "/")
-file
-author <- scan(file = file, 
-                      what = "character",
-                      blank.lines.skip = T,
-                      n = 100000,
-                      skip = 20,
-                      sep = "\n",
-                      strip.white = T)
+load_cases <- function(justice){
+  justice <- tolower(justice)
+  check.name <- c("boyle" , "mills", "owsley")
+  if (any(justice == check.name)) {
+    file <- paste (getwd(), "data", paste(justice, "txt", sep = "."), sep = "/")
+    author <- scan(file = file, 
+                   what = "character",
+                   blank.lines.skip = T,
+                   skip = 20,
+                   sep = "\n",
+                   strip.white = T)
+      
+    }else{ 
+      print(c("must match:", check.name), quote = F)
+    }
+}
+
+
 
 
 # set up file names--Author_Westlaw Number
