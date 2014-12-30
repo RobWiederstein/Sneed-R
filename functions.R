@@ -1,5 +1,4 @@
 #read data in
-
 load_cases <- function(justice){
   justice <- tolower(justice)
   check.name <- c("boyle" , "mills", "owsley")
@@ -16,6 +15,7 @@ load_cases <- function(justice){
       print(c("must match:", check.name), quote = F)
   }
 }
+#get Westlaw numbers to name cases
 case_cite <- function(cases){
   cite <- grep("^\\(Cite as: (.*)\\)$", cases, value = T)
   pattern <- "18[0123][0-9].WL.(.*)\\(K"
@@ -24,6 +24,8 @@ case_cite <- function(cases){
   cite <- trim(gsub("\\(K", "", cite))
   cite
 }
+
+#Paste a "0" to case names to make the same length
 same_cite_length <- function(cite){
   library (stringr)
   cite <- str_split(cite, pattern = " ")
@@ -42,9 +44,7 @@ same_cite_length <- function(cite){
   print(cite)
 }
 
-same_cite_length(case_cite(load_cases("mills")))
-
-#split download into cases and save
+#split large download into individual cases and save
 divide_into_cases  <- function(justice = "boyle"){
   author <- load_cases(justice)
   begin <- grep("^\\(Cite as: (.*)\\)$", author, value = F)
@@ -59,7 +59,8 @@ divide_into_cases  <- function(justice = "boyle"){
       write(mycase, file = file)
   }
 }
-#get rid of headnotes since they are added by publisher
+
+#eliminate headnotes since they are added by publisher
 strip_headnotes    <- function(justice = "boyle"){
   path  <- paste(getwd(), justice, sep = "/")
   files_in <- list.files(path = path, pattern = paste("^", justice, sep = "")) #all files??
@@ -74,7 +75,9 @@ strip_headnotes    <- function(justice = "boyle"){
     unlink(paste(path, files_in[i], sep = "/"))
   }
 }
-##need to look at files
+
+#eliminate dissents and concurrences because they are written
+#by different authors
 check_dissent <- function(justice = "boyle"){
   justice <- "boyle"
   path  <- paste(getwd(), justice, sep = "/")
