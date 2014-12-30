@@ -95,9 +95,36 @@ cut_dissent_concur <- function(justice = "boyle"){
   }
   print(length(list.files(path = path)))
 }
+#take cases from each justice to determine who wrote Sneed
+copy_case_to_primary_set <- function(justice, size = 25, seed = 1234){
+  set.seed(seed)
+  justice <- tolower(justice)
+  path_justice <- paste(getwd(), justice, sep = "/")
+  path_primary_set <- paste(getwd(), "primary_set", sep = "/")
+  justice_cases <- list.files(path = path_justice)
+  random_case <- sample(justice_cases, size = size)
+  path_justice_case <- paste(path_justice, random_case, sep = "/")
+  path_primary_set_case <- paste(path_primary_set, random_case, sep = "/")
+  file.copy(from = path_justice_case, to = path_primary_set_case)
+}
 
-#Corpus built for justice boyle.  Run it with Stylo.
-#library (stylo)
-#a <- stylo()
-#b <- classify()
+#build corpus to compare justice's writing styles
+copy_case_to_corpus <- function(justice, size = 25, seed = 1234){
+  set.seed(seed)
+  justice <- tolower(justice)
+  path_justice <- paste(getwd(), justice, sep = "/")
+  path_corpus <- paste(getwd(), "corpus", sep = "/")
+  justice_cases <- list.files(path = path_justice)
+  random_case <- sample(justice_cases, size = size)
+  path_justice_case <- paste(path_justice, random_case, sep = "/")
+  path_corpus_case <- paste(path_corpus, random_case, sep = "/")
+  file.copy(from = path_justice_case, to = path_corpus_case)
+}
 
+#remove "justice" directories & "corpus" and "primary_set"
+clean_up <- function(){
+  temp <- c("boyle", "mills", "owsley", "corpus", "primary_set")
+  dir_paths <- paste(getwd(), temp, sep = "/")
+  file.remove(list.files(dir_paths, full.names = T))
+  unlink (dir_paths[1:3], recursive = T)
+}
