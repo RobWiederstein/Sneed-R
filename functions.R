@@ -78,15 +78,12 @@ strip_headnotes    <- function(justice = "boyle"){
 
 #eliminate dissents and concurrences because they are written
 #by different authors
-check_dissent <- function(justice = "boyle"){
-  justice <- "boyle"
+cut_dissent_concur <- function(justice = "boyle"){
   path  <- paste(getwd(), justice, sep = "/")
   files_in <- list.files(path = path, pattern = ".txt$")  #all files ending in ".txt"
-  files_out <- paste (files_in, "-out1.txt", sep = "")
   omit.case <- NULL
   i     <- NULL
-  for(i in seq(along = files_in)) { # start for loop with numeric or character vector;
-    # numeric vector is often more flexible
+  for(i in seq(along = files_in)){
     x <- scan(paste(path, files_in[i], sep = "/"), what = "character", sep = "\n")
     if(length (grep ("concur", x, ignore.case = T)) >= 1 |
          length (grep ("dissent", x, ignore.case = T)) >= 1){
@@ -96,9 +93,9 @@ check_dissent <- function(justice = "boyle"){
     omit.case <- paste(path, omit.case, sep = "/")
     file.remove(omit.case)  
   }
-  
+  print(length(list.files(path = path)))
 }
-setdiff(list.files(path = path, pattern = ".txt"), list.files(path = path))
+
 #Corpus built for justice boyle.  Run it with Stylo.
 #library (stylo)
 #a <- stylo()
