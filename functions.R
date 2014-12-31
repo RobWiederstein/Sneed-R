@@ -21,6 +21,7 @@ case_cite <- function(cases){
   pattern <- "18[0123][0-9].WL.(.*)\\(K"
   x <- regexpr(pattern, cite)
   cite <- substring(cite, x, x + attr(x, "match.length") - 1)
+  library(gdata)
   cite <- trim(gsub("\\(K", "", cite))
   cite
 }
@@ -58,6 +59,33 @@ divide_into_cases  <- function(justice = "boyle"){
       file <- paste(getwd(), justice, file_name[i], sep = "/") #create directory
       write(mycase, file = file)
   }
+}
+#double check boyle as author.  Westlaw had 612.  Narrowed to 592.
+confirm_boyle_author <- function(){
+  patterns <- c("opinion of the Court by Chief Justice Boyle", "opinion of the court, by ch. j. boyle",
+                "opinion of the court by judge boyle", "opinion of the court by chief justice boyle",
+                "chief justice boyle delivered the opinion of the court", "opinion of the court, by judge boyle",
+                "judge boyle delivered the opinion of the court", "judge boyle delivered the determination of the court",
+                "following opinion was delivered by Chief Justice Boyle")
+  justice <- "boyle"
+  path  <- paste(getwd(), justice, sep = "/")
+  files_in <- list.files(path = path, pattern = paste("^", justice, sep = ""))
+  i  <- NULL
+  j  <- NULL
+  keep.case <- NULL
+  for (i in seq(along = files_in)){
+    for(j in seq(along = patterns)){
+      x <- scan(paste(path, files_in[i], sep = "/"), what = "character", sep = "\n")
+      if(grepl(patterns[j], x, ignore.case = T) == T){
+        keep.case <- append(keep.case, files_in[i])
+        print(files_in[i])
+      }else{
+        next(j)}
+    }
+    next(j)
+  }
+  keep.case <- unique(keep.case)
+  unlink(paste(path, setdiff(files_in, keep.case), sep = "/"))
 }
 
 #eliminate headnotes since they are added by publisher

@@ -7,6 +7,7 @@ source("functions.R")
 
 #build boyle corpus
 divide_into_cases("boyle")
+confirm_boyle_author()
 strip_headnotes("boyle")
 cut_dissent_concur("boyle")
 
@@ -28,9 +29,9 @@ copy_case_to_primary_set("owsley")
 
 #take 25 random cases from each justice and
 #place into "corpus" directory for stylometry
-copy_case_to_corpus("boyle", size = 10, seed = 15)
-copy_case_to_corpus("mills", size = 10, seed = 15)
-copy_case_to_corpus("owsley", size = 10, seed = 15)
+copy_case_to_corpus("boyle", size = 10, seed = 16)
+copy_case_to_corpus("mills", size = 10, seed = 16)
+copy_case_to_corpus("owsley", size = 10, seed = 16)
 
 #Compare writing styles of justices with Stylo.
 library (stylo)
