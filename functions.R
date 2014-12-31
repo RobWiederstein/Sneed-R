@@ -94,8 +94,8 @@ confirm_mills_author <- function(){
                 "opinion of the court by judge mills",
                 "judge mills delievered the opinion of the court",
                 "opinion of the court\\. by judge mills",
-                "opinion of judge mills",
-  )
+                "opinion of judge mills"
+                )
   justice <- "mills"
   path <- paste(getwd(), justice, sep = "/")
   files_in <- list.files(path = path)
@@ -113,6 +113,35 @@ confirm_mills_author <- function(){
     }
     next(j)
   }
+  keep.case <- unique(keep.case)
+  unlink(paste(path, setdiff(files_in, keep.case), sep = "/"))
+}
+#1008 cases to start, 988 after pruning.
+confirm_owsley_author <- function(){
+  patterns <- c("judge owsley delivered the opinion of the court",
+                "opinion of the court, by judge owsley",
+                "judge owsley delivered the opinion of the court",
+                "opinion of the court by judge owsley",
+                "judge owsley delivered the following opinion"
+                )
+  justice <- "owsley"
+  path <- paste(getwd(), justice, sep = "/")
+  files_in <- list.files(path = path)
+  i  <- NULL
+  j  <- NULL
+  keep.case <- NULL
+  for (i in seq(along = files_in)){
+    for(j in seq(along = patterns)){
+      x <- scan(paste(path, files_in[i], sep = "/"), what = "character", sep = "\n")
+      if(grepl(patterns[j], x, ignore.case = T) == T){
+        keep.case <- append(keep.case, files_in[i])
+        print(files_in[i])
+      }else{
+        next(j)}
+    }
+    next(j)
+  }
+  
   keep.case <- unique(keep.case)
   unlink(paste(path, setdiff(files_in, keep.case), sep = "/"))
 }
@@ -164,6 +193,28 @@ copy_case_to_primary_set <- function(justice, size = 25, seed = 1234){
   path_justice_case <- paste(path_justice, random_case, sep = "/")
   path_primary_set_case <- paste(path_primary_set, random_case, sep = "/")
   file.copy(from = path_justice_case, to = path_primary_set_case)
+}
+#build corpus from "x" biggest case from each justice
+biggest_cases_for_corpus <- function(justice, sample_size = 10){
+  usual_path <- path.expand("~/Git/Sneed-R") #assumes this is the wd()
+  justice_path <- paste(usual_path, justice, sep = "/")
+  dest_path <- paste(usual_path, "corpus", sep = "/")
+  setwd(justice_path)
+  a <- file.info(list.files(path = getwd()))
+  file_name <- rownames(a)
+  size <- a[, 1]
+  a <-cbind(file_name, size)
+  a <- as.data.frame(a, stringsAsFactors = F)
+  a$size <- as.integer(a$size)
+  attach(a)
+  justice_files <- a[rev(order(size)), ]
+  justice_files <- justice_files[1:sample_size, 1]
+  detach(a)
+  setwd(usual_path)
+  from <- paste(justice_path, justice_files, sep = "/")
+  to <- paste(dest_path, justice_files, sep = "/")
+  file.copy(from = from, to = to)
+  justice_files
 }
 
 #build corpus to compare justice's writing styles
