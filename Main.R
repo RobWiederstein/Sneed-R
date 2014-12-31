@@ -27,6 +27,27 @@ copy_case_to_primary_set("mills")
 copy_case_to_primary_set("owsley")
 
 #take 25 random cases from each justice and
-#place into "corpus" director for stylometry
+#place into "corpus" directory for stylometry
+copy_case_to_corpus("boyle", size = 10, seed = 15)
+copy_case_to_corpus("mills", size = 10, seed = 15)
+copy_case_to_corpus("owsley", size = 10, seed = 15)
+
+#Compare writing styles of justices with Stylo.
+library (stylo)
+a <- stylo()
+
+#Identify if "Sneed" authored pamphlet
+b <- classify()
+
+#remove "justice" directories & "corpus" and "primary_set"
+clean_up()
+
+
+
+
+
+
+
+
 
 
