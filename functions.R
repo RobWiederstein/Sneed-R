@@ -87,6 +87,36 @@ confirm_boyle_author <- function(){
   keep.case <- unique(keep.case)
   unlink(paste(path, setdiff(files_in, keep.case), sep = "/"))
 }
+#confirm mills as author.  Westlaw had 539 cases and left with 530
+confirm_mills_author <- function(){
+  patterns <- c("Opinion of the court, by judge mills",
+                "judge mills delivered the opinion of the court",
+                "opinion of the court by judge mills",
+                "judge mills delievered the opinion of the court",
+                "opinion of the court\\. by judge mills",
+                "opinion of judge mills",
+  )
+  justice <- "mills"
+  path <- paste(getwd(), justice, sep = "/")
+  files_in <- list.files(path = path)
+  i  <- NULL
+  j  <- NULL
+  keep.case <- NULL
+  for (i in seq(along = files_in)){
+    for(j in seq(along = patterns)){
+      x <- scan(paste(path, files_in[i], sep = "/"), what = "character", sep = "\n")
+      if(grepl(patterns[j], x, ignore.case = T) == T){
+        keep.case <- append(keep.case, files_in[i])
+        print(files_in[i])
+      }else{
+        next(j)}
+    }
+    next(j)
+  }
+  keep.case <- unique(keep.case)
+  unlink(paste(path, setdiff(files_in, keep.case), sep = "/"))
+}
+
 
 #eliminate headnotes since they are added by publisher
 strip_headnotes    <- function(justice = "boyle"){
